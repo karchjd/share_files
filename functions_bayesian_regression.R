@@ -5,7 +5,7 @@ bayesian_linear_regression <- function(y, X, alpha, beta) {
   posterior_mean <- solve(posterior_covariance_inv) %*% (beta * t(X) %*% y)
 
 
-  result <- list(posterior_mean = posterior_mean, posterior_covariance = solve(posterior_covariance_inv))
+  result <- list(posterior_mean = posterior_mean, posterior_covariance = solve(posterior_covariance_inv), beta = beta)
   class(result) <- "bayesregml"
   return(result)
 }
@@ -22,7 +22,7 @@ predict.bayesregml <- function(object, newdata, prediction = "latent") {
   # Calculate predictive variances see Equation 3.59 
   predictive_covariance <-  newdata %*% object$posterior_covariance %*% t(newdata)
   if(prediction != "latent"){
-    predictive_covariance <-  diag(1 / beta) + predictive_covariance
+    predictive_covariance <-  diag(1 / object$beta, nrow(newdata)) + predictive_covariance
   }
   result <- list(predictive_means = predictive_means, predictive_covariance = predictive_covariance, X = newdata, method = prediction)
   class(result) <- "preddist"
